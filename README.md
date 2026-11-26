@@ -77,6 +77,8 @@ tests/logic.test.js      # Built-in Node test runner
 
 `npm test` runs nine tests covering mock data, duration formatting, search/filter, playlist names, duplicates, removal, reordering, storage and queue navigation.
 
+The unit tests passed in the preparation environment. The JSX and Tailwind CSS were also checked in an offline Chromium smoke test using locally available React, a mock Axios adapter and in-memory storage. The standard npm installation, actual Axios network request, real browser storage across page reloads and Vite production build still need to be checked on a machine with npm registry access.
+
 Manual verification checklist after installing the project:
 
 - Create empty/duplicate names (reject); create a unique playlist; rename it; cancel and confirm deletion.
