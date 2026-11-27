@@ -1,110 +1,277 @@
-# Mixtape — Music Playlist Manager
 
-A responsive React application for browsing songs, organizing playlists, and simulating music playback. Built for the Frontend Developer assignment at Micro Integrated Semiconductor Systems Pvt. Ltd.
+# Mixtape – Music Playlist Manager
 
-## Tech stack
+A modern, responsive Music Playlist Manager web application built using React, Tailwind CSS, Axios, and localStorage.
 
-- React 19 + Vite
-- Tailwind CSS 4 with custom CSS for responsive layouts and artwork
-- Axios for fetching `public/songs.json`
-- Browser localStorage for saving playlists
+Developed as part of the Frontend Developer assignment for Micro Integrated Semiconductor Systems Pvt. Ltd.
 
-## Run locally
+## Live Demo
 
-Prerequisites: Node.js 22 or newer, npm, and Git. An internet connection is required for the first dependency installation.
+- **Live Application:** https://bejewelled-peony-157996.netlify.app/
+- **GitHub Repository:** https://github.com/saurabh-karale/music-playlist-manager
 
-```bash
-npm install
-npm run dev
-```
+## Tech Stack
 
-Open the local URL printed by Vite (normally `http://localhost:5173`). Do not open `index.html` directly.
-
-```bash
-npm test         # Run the automated unit tests
-npm run build    # Generate production files in dist/
-npm run preview  # Serve the production build locally
-```
+- React 19
+- Vite
+- Tailwind CSS 4
+- Custom CSS
+- Axios
+- localStorage
+- Git and GitHub
+- Netlify
 
 ## Features
 
-- Song library of 12 mock tracks, searchable by title, artist or genre, with a genre filter and `mm:ss` duration.
-- Create, rename and delete playlists (confirmation before deletion); blank and duplicate names are rejected.
-- Add songs to the selected playlist; duplicate songs are prevented. Remove songs and change order using up/down arrows.
-- View song count and total duration for each playlist.
-- Simulated Play/Pause, Next, Previous and Play mix controls, elapsed/total time and a seekable progress bar. No audio files or streaming API are used.
-- Playlists and their song order persist across refreshes through localStorage.
-- Responsive layouts, reusable components, loading, no-results, empty and network-error states.
+### Song Library
 
-## How to use
+- Browse 12 songs with title, artist, genre, and duration.
+- Search songs by title, artist, or genre.
+- Filter songs by genre.
+- Display song duration in mm:ss format.
+- Fetch song data from a local JSON file using Axios.
 
-1. Click **New playlist** and enter a unique name. The new playlist is selected automatically.
-2. Search or filter the song library. Click **+** next to a song to add it. A check mark means it is already in the selected playlist.
-3. Select any playlist in the sidebar to view or edit it. On smaller screens, use **View mix** to jump to the playlist details.
-4. Use the arrows to change song order or the **×** button to remove a song. Rename or delete with the buttons next to **Play mix**.
-5. Click a track's artwork or **Play mix** to simulate playback. Use the bottom player to pause, resume, navigate tracks or seek to another position using the progress bar.
+### Playlist Management
 
-## Project structure
+- Create, rename, and delete playlists.
+- Confirmation modal before deleting a playlist.
+- Playlist names are required and must be unique.
+- Add and remove songs from playlists.
+- Prevent duplicate songs within the same playlist.
+- Reorder songs using up and down buttons.
+- Display total song count and playlist duration.
 
-```text
-public/
-  songs.json              # 12 mock songs with durations in seconds
-  favicon.svg
-src/
-  main.jsx                # React entry point
-  App.jsx                 # State, side effects and feature handlers
-  index.css               # Tailwind import and custom visual styles
-  components/             # Button, Input, Modal, SongRow, PlaylistCard,
-                          # PlayerBar, SongLibrary, PlaylistDetails, etc.
-  lib/
-    api.js                # Axios request
-    songs.js              # Duration formatting and library filtering
-    playlists.js          # Playlist validation, storage, song operations
-    player.js             # Queue navigation and simulated playback timing
-tests/logic.test.js      # Built-in Node test runner
+### Music Player
+
+- Play and Pause controls.
+- Next and Previous track navigation.
+- Display current song information.
+- Display elapsed time and total song duration.
+- Interactive and seekable progress bar.
+- Automatic transition to the next song.
+- Pause and resume playback without losing elapsed time.
+
+Playback is simulated as specified in the assignment. No real audio streaming is required.
+
+### Data Persistence
+
+- Playlists are saved using browser localStorage.
+- Playlist data and song order persist across page refreshes.
+
+### Responsive UI
+
+- Mobile layout (375px).
+- Tablet layout (768px).
+- Desktop layout (1440px).
+- Reusable UI components.
+- Consistent colors, typography, and spacing.
+- Loading, empty playlist, no-results, and error states.
+
+## Installation and Setup
+
+### Prerequisites
+
+- Node.js 22 or newer
+- npm
+- Git
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/saurabh-karale/music-playlist-manager.git
 ```
 
-## Assumptions made
+### Step 2: Navigate to the Project Directory
 
-- A starter playlist, **My first mix**, contains three songs on first use. Users can rename or delete it. An empty saved collection is not replaced by starter data.
-- Names are trimmed, case-insensitively unique and limited to 60 characters. Songs can appear in different playlists, but never twice in the same playlist.
-- The playlist total displays whole minutes (rounded down); individual tracks use exact minutes and seconds.
-- Playback is simulated using a one-second interval. Pause preserves the elapsed time; changing tracks resets it. Seeking changes the simulated position. At the end of a track, the next track starts automatically. Next/Previous wrap around the current source queue (all library songs or the playlist from which playback started). The library search/filter does not change its playback queue. The current playing track and filter settings are not persisted; only playlists are required to persist.
-- No backend, authentication or external assets are needed. Artwork is original CSS decoration, not album covers. Song metadata is illustrative mock data.
-- If storage is blocked, the app remains usable in memory and shows a warning.
+```bash
+cd music-playlist-manager
+```
 
-## Tests and verification
+### Step 3: Install Dependencies
 
-`npm test` runs thirteen tests covering mock data, duration formatting, search/filter, playlist names, duplicates, removal, reordering, storage, queue navigation, playback timing and seeking.
+```bash
+npm install
+```
 
-All 13 unit tests passed in the preparation environment. The updated JSX and Tailwind CSS were also checked in an offline Chromium smoke test using locally available React 18.2, a mock Axios adapter and the sample song data. Timer progression, pause, resume, seeking, automatic next track, previous track, and no horizontal overflow at 375, 768 and 1440 pixels were verified. The standard npm installation, actual React 19/Vite production build, Axios request, and real browser storage across page reloads still need to be checked on a machine with npm registry access. The actual Netlify deployment is not yet performed.
+### Step 4: Start the Development Server
 
-Manual verification checklist after installing the project:
+```bash
+npm run dev
+```
 
-- Create empty/duplicate names (reject); create a unique playlist; rename it; cancel and confirm deletion.
-- Add two songs; attempt duplicate addition; move up/down; remove a song; refresh and verify the playlist stays saved.
-- Search for a nonexistent track; change genre; reset filters.
-- Play a library song and playlist; verify Pause, Next and Previous, including wraparound. Check that elapsed time advances, pauses and resumes, seeking works, and the next song starts at 0:00.
-- Inspect widths of 375, 768 and 1440 pixels. Confirm no horizontal scrolling and that all buttons are reachable.
-- Use browser network throttling or temporarily block `songs.json` to check loading and error/retry states.
+Open the local URL displayed in the terminal, normally:
 
-## What I would improve
+http://localhost:5173
 
-- Add drag-and-drop as an alternative to up/down buttons.
-- Add more end-to-end tests with the actual Vite server and Axios.
-- Add custom playlist artwork and sorting options.
-- Add an optional backend with login and cloud synchronization if future requirements need it.
+## Available Commands
 
-## Deploy on Netlify
+| Command | Description |
+| --- | --- |
+| npm install | Install project dependencies |
+| npm run dev | Start the development server |
+| npm test | Run automated unit tests |
+| npm run build | Create a production build |
+| npm run preview | Preview the production build |
 
-1. Push the existing project repository to GitHub (keep its Git history).
-2. In Netlify, import the GitHub repository as a new project.
-3. Leave the base directory blank if `package.json` is at the root. The included `netlify.toml` sets Node.js 22, build command `npm run build` and publish directory `dist`.
-4. Deploy and open the generated live URL. Verify the songs load, the player timer works and playlists survive a refresh.
-5. Add the actual live link to this README before submitting.
+## Project Structure
 
-There are no environment variables containing secrets or backend setup requirements. The Vercel configuration has been removed; this version is configured for Netlify.
+```text
+music-playlist-manager/
+├── public/
+│   ├── songs.json
+│   └── favicon.svg
+├── src/
+│   ├── components/
+│   ├── lib/
+│   │   ├── api.js
+│   │   ├── songs.js
+│   │   ├── playlists.js
+│   │   └── player.js
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── tests/
+│   └── logic.test.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── netlify.toml
+└── README.md
+```
 
-## Git history
+## Reusable Components
 
-The project is organized into incremental local commits. Run `git log --oneline` to review the history. Use your own Git identity for future commits. Publish the existing repository rather than creating a new repository inside the project folder.
+The application uses reusable React components to maintain consistent styling and improve code maintainability.
+
+- Button
+- Input
+- Modal
+- SongRow
+- PlaylistCard
+- PlayerBar
+- SongLibrary
+- PlaylistDetails
+
+## How to Use
+
+1. Create a new playlist using the New Playlist button.
+2. Enter a unique playlist name.
+3. Browse, search, or filter songs in the song library.
+4. Add songs to the selected playlist.
+5. Rename, delete, remove, or reorder songs as required.
+6. Select a song or click Play Mix to simulate playback.
+7. Use the player controls to pause, resume, navigate tracks, or seek through the progress bar.
+
+Playlist changes are automatically saved using localStorage.
+
+## Assumptions Made
+
+- Song information is illustrative mock data stored in `public/songs.json`.
+- Real audio playback is not required for this assignment.
+- A starter playlist is provided for first-time users.
+- Playlist names are trimmed, case-insensitively unique, and limited to 60 characters.
+- A song can belong to multiple playlists but cannot appear twice in the same playlist.
+- Playlist duration is displayed in whole minutes, while individual song durations use mm:ss format.
+- Playback progress is simulated using a one-second interval.
+- Next and Previous controls navigate the current playback queue.
+- Only playlist data is persisted across page refreshes.
+- No backend, database, authentication, or external music API is required.
+- If localStorage is unavailable, the application remains usable in memory and displays a warning.
+
+## Testing and Verification
+
+The project includes 13 automated unit tests covering:
+
+- Song data validation
+- Duration formatting
+- Song search and genre filtering
+- Playlist name validation
+- Duplicate song prevention
+- Song removal and reordering
+- Playlist storage
+- Playback queue navigation
+- Playback timing
+- Progress bar seeking
+
+All 13 unit tests passed in the preparation environment.
+
+Responsive layouts and playback interactions were also checked using an offline Chromium browser with a mock Axios adapter and locally available React 18.2.
+
+To run the tests locally:
+
+```bash
+npm test
+```
+
+### Manual Testing Checklist
+
+- Create, rename, and delete playlists.
+- Validate empty and duplicate playlist names.
+- Add, remove, and reorder songs.
+- Verify search and genre filtering.
+- Verify Play, Pause, Next, and Previous controls.
+- Verify playback timer and progress bar.
+- Refresh the page and verify playlist persistence.
+- Check responsive layouts at 375px, 768px, and 1440px.
+- Verify song loading and error states.
+
+The offline browser checks do not replace full end-to-end testing with the production dependencies and deployed application.
+
+## Deployment
+
+The application is deployed on Netlify.
+
+**Live URL:** https://bejewelled-peony-157996.netlify.app/
+
+### Netlify Configuration
+
+| Setting | Value |
+| --- | --- |
+| Build command | npm run build |
+| Publish directory | dist |
+| Node.js version | 22 |
+
+The project includes a `netlify.toml` configuration file.
+
+To deploy manually:
+
+1. Install dependencies using `npm install`.
+2. Generate the production build using `npm run build`.
+3. Upload the generated `dist` folder to Netlify.
+4. Open the deployed application URL.
+
+Alternatively, the GitHub repository can be connected directly to Netlify for automatic deployments.
+
+No environment variables or backend configuration are required.
+
+## Git Version Control
+
+The project uses incremental Git commits to track feature development, testing, documentation, and deployment configuration.
+
+To view the commit history:
+
+```bash
+git log --oneline
+```
+
+## Future Improvements
+
+- Add drag-and-drop playlist reordering.
+- Add optional real audio playback.
+- Add custom playlist artwork.
+- Add additional song sorting options.
+- Add user authentication and cloud synchronization.
+- Expand automated end-to-end testing.
+- Improve accessibility through additional testing.
+
+## Developer
+
+**Saurabh Karale**
+
+Frontend Developer
+
+GitHub: https://github.com/saurabh-karale
+
+---
+
+Developed for the Frontend Developer technical assignment at Micro Integrated Semiconductor Systems Pvt. Ltd.
