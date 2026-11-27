@@ -8,7 +8,7 @@ import Button from './components/Button.jsx';
 import Icon from './components/Icon.jsx';
 import { fetchSongs } from './lib/api.js';
 import { loadPlaylists, savePlaylists, addSong, removeSong, moveSong } from './lib/playlists.js';
-import { initialPlayer, stepTrack } from './lib/player.js';
+import { initialPlayer, selectTrack, navigateTrack, seekTrack, tickPlayer } from './lib/player.js';
 
 export default function App() {
   const [songs, setSongs] = useState([]);
@@ -40,10 +40,21 @@ export default function App() {
   const selected = playlists.find(item => item.id === selectedId);
   const selectedSongs = (selected?.songIds ?? []).map(id => songById.get(id)).filter(Boolean);
   const sourcePlaylist = playlists.find(item => item.id === player.playlistId);
-  const libraryQueue = songs.map(song => song.id);
-  const queue = player.source === 'playlist' && sourcePlaylist ? sourcePlaylist.songIds.filter(id => songById.has(id)) : libraryQueue;
+  const libraryQueue = useMemo(() => songs.map(song => song.id), [songs]);
+  const queue = useMemo(() => player.source === 'playlist' && sourcePlaylist
+    ? sourcePlaylist.songIds.filter(id => songById.has(id)) : libraryQueue,
+    [player.source, sourcePlaylist, songById, libraryQueue]);
   const currentSong = songById.get(player.songId);
   const queueName = player.source === 'playlist' && sourcePlaylist ? sourcePlaylist.name : 'Song library';
+
+  // Start one timer while playing; clean it up on pause, track change or unmount.
+  useEffect(() => {
+    if (!player.playing || !currentSong) return;
+    const timer = setInterval(() => setPlayer(previous =>
+      previous.songId === currentSong.id ? tickPlayer(previous, queue, currentSong.duration) : previous
+    ), 1000);
+    return () => clearInterval(timer);
+  }, [player.playing, currentSong, queue]);
 
   function updateSelected(update) {
     setPlaylists(previous => previous.map(item => item.id === selectedId ? { ...item, songIds: update(item.songIds) } : item));
@@ -75,22 +86,20 @@ export default function App() {
     if (player.playlistId === selectedId && player.songId === id) {
       const remaining = selected.songIds.filter(item => item !== id && songById.has(item));
       const next = remaining[selected.songIds.indexOf(id)] ?? remaining[0];
-      setPlayer(next ? { ...player, songId: next } : initialPlayer);
+      setPlayer(next ? { ...player, songId: next, elapsed: 0 } : initialPlayer);
     }
     setNotice('Song removed from playlist.');
   }
   function playSong(id, source, force = false) {
     const playlistId = source === 'playlist' ? selectedId : null;
-    setPlayer(previous => ({ songId: id, source, playlistId,
-      playing: force || !(previous.songId === id && previous.source === source && previous.playlistId === playlistId && previous.playing) }));
+    setPlayer(previous => selectTrack(previous, id, source, playlistId, force));
   }
   function togglePlayer() {
     if (currentSong) setPlayer(previous => ({ ...previous, playing: !previous.playing }));
-    else if (queue.length) setPlayer(previous => ({ ...previous, songId: queue[0], playing: true }));
+    else if (queue.length) setPlayer(previous => ({ ...previous, songId: queue[0], playing: true, elapsed: 0 }));
   }
   function navigate(direction) {
-    const id = stepTrack(queue, player.songId, direction);
-    if (id !== null) setPlayer(previous => ({ ...previous, songId: id, playing: previous.songId === null || previous.playing }));
+    setPlayer(previous => navigateTrack(previous, queue, direction));
   }
   const openCreate = () => setModal({ mode: 'create' });
   const modalPlaylist = playlists.find(item => item.id === modal?.id);
@@ -107,7 +116,7 @@ export default function App() {
       </div>
       <div className="workspace-footer">MIXTAPE <span> / </span> A little space for the music you love.</div>
     </main>
-    <PlayerBar song={currentSong} playing={player.playing} queueName={queueName} canPlay={queue.length > 0} onToggle={togglePlayer} onNext={() => navigate(1)} onPrevious={() => navigate(-1)}/>
+    <PlayerBar song={currentSong} elapsed={player.elapsed} onSeek={seconds => currentSong && setPlayer(previous => seekTrack(previous, seconds, currentSong.duration))} playing={player.playing} queueName={queueName} canPlay={queue.length > 0} onToggle={togglePlayer} onNext={() => navigate(1)} onPrevious={() => navigate(-1)}/>
     <div role="status" aria-live="polite" className={`toast ${notice ? 'visible' : ''}`}>{notice && <><Icon name="check"/><span>{notice}</span></>}</div>
     {modal && <PlaylistModal key={`${modal.mode}-${modal.id ?? ''}`} mode={modal.mode} playlist={modalPlaylist} playlists={playlists} onClose={() => setModal(null)} onSave={createOrRename} onDelete={deletePlaylist}/>}
   </div>;
