@@ -32,7 +32,7 @@ npm run preview  # Serve the production build locally
 - Create, rename and delete playlists (confirmation before deletion); blank and duplicate names are rejected.
 - Add songs to the selected playlist; duplicate songs are prevented. Remove songs and change order using up/down arrows.
 - View song count and total duration for each playlist.
-- Simulated Play/Pause, Next, Previous and Play mix controls. No audio files or streaming API are used.
+- Simulated Play/Pause, Next, Previous and Play mix controls, elapsed/total time and a seekable progress bar. No audio files or streaming API are used.
 - Playlists and their song order persist across refreshes through localStorage.
 - Responsive layouts, reusable components, loading, no-results, empty and network-error states.
 
@@ -42,7 +42,7 @@ npm run preview  # Serve the production build locally
 2. Search or filter the song library. Click **+** next to a song to add it. A check mark means it is already in the selected playlist.
 3. Select any playlist in the sidebar to view or edit it. On smaller screens, use **View mix** to jump to the playlist details.
 4. Use the arrows to change song order or the **×** button to remove a song. Rename or delete with the buttons next to **Play mix**.
-5. Click a track's artwork or **Play mix** to simulate playback. Use the bottom player to pause, resume, or navigate tracks.
+5. Click a track's artwork or **Play mix** to simulate playback. Use the bottom player to pause, resume, navigate tracks or seek to another position using the progress bar.
 
 ## Project structure
 
@@ -60,7 +60,7 @@ src/
     api.js                # Axios request
     songs.js              # Duration formatting and library filtering
     playlists.js          # Playlist validation, storage, song operations
-    player.js             # Queue navigation
+    player.js             # Queue navigation and simulated playback timing
 tests/logic.test.js      # Built-in Node test runner
 ```
 
@@ -69,13 +69,13 @@ tests/logic.test.js      # Built-in Node test runner
 - A starter playlist, **My first mix**, contains three songs on first use. Users can rename or delete it. An empty saved collection is not replaced by starter data.
 - Names are trimmed, case-insensitively unique and limited to 60 characters. Songs can appear in different playlists, but never twice in the same playlist.
 - The playlist total displays whole minutes (rounded down); individual tracks use exact minutes and seconds.
-- Playback is simulated. Next/Previous wrap around the current source queue (all library songs or the playlist from which playback started). The library search/filter does not change its playback queue. The current playing track and filter settings are not persisted; only playlists are required to persist.
+- Playback is simulated using a one-second interval. Pause preserves the elapsed time; changing tracks resets it. Seeking changes the simulated position. At the end of a track, the next track starts automatically. Next/Previous wrap around the current source queue (all library songs or the playlist from which playback started). The library search/filter does not change its playback queue. The current playing track and filter settings are not persisted; only playlists are required to persist.
 - No backend, authentication or external assets are needed. Artwork is original CSS decoration, not album covers. Song metadata is illustrative mock data.
 - If storage is blocked, the app remains usable in memory and shows a warning.
 
 ## Tests and verification
 
-`npm test` runs nine tests covering mock data, duration formatting, search/filter, playlist names, duplicates, removal, reordering, storage and queue navigation.
+`npm test` runs thirteen tests covering mock data, duration formatting, search/filter, playlist names, duplicates, removal, reordering, storage, queue navigation, playback timing and seeking.
 
 The unit tests passed in the preparation environment. The JSX and Tailwind CSS were also checked in an offline Chromium smoke test using locally available React, a mock Axios adapter and in-memory storage. The standard npm installation, actual Axios network request, real browser storage across page reloads and Vite production build still need to be checked on a machine with npm registry access.
 
@@ -84,7 +84,7 @@ Manual verification checklist after installing the project:
 - Create empty/duplicate names (reject); create a unique playlist; rename it; cancel and confirm deletion.
 - Add two songs; attempt duplicate addition; move up/down; remove a song; refresh and verify the playlist stays saved.
 - Search for a nonexistent track; change genre; reset filters.
-- Play a library song and playlist; verify Pause, Next and Previous, including wraparound.
+- Play a library song and playlist; verify Pause, Next and Previous, including wraparound. Check that elapsed time advances, pauses and resumes, seeking works, and the next song starts at 0:00.
 - Inspect widths of 375, 768 and 1440 pixels. Confirm no horizontal scrolling and that all buttons are reachable.
 - Use browser network throttling or temporarily block `songs.json` to check loading and error/retry states.
 
@@ -95,15 +95,15 @@ Manual verification checklist after installing the project:
 - Add custom playlist artwork and sorting options.
 - Add an optional backend with login and cloud synchronization if future requirements need it.
 
-## Deploy on Vercel
+## Deploy on Netlify
 
-1. Push the project repository to GitHub (keep its Git history).
-2. In Vercel, choose **Add New → Project** and import the GitHub repository.
-3. Select the **Vite** framework preset. Install: `npm install`. Build: `npm run build`. Output: `dist`. Use Node.js 22 or newer.
-4. Deploy and open the generated production URL. Verify the songs load and playlist persistence works in the deployed app.
+1. Push the existing project repository to GitHub (keep its Git history).
+2. In Netlify, import the GitHub repository as a new project.
+3. Leave the base directory blank if `package.json` is at the root. The included `netlify.toml` sets Node.js 22, build command `npm run build` and publish directory `dist`.
+4. Deploy and open the generated live URL. Verify the songs load, the player timer works and playlists survive a refresh.
 5. Add the actual live link to this README before submitting.
 
-There are no environment variables, secrets or backend setup requirements. A `vercel.json` configuration is included. Netlify can also deploy using build command `npm run build` and publish directory `dist`.
+There are no environment variables containing secrets or backend setup requirements. The Vercel configuration has been removed; this version is configured for Netlify.
 
 ## Git history
 
