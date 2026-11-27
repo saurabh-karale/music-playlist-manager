@@ -77,7 +77,7 @@ tests/logic.test.js      # Built-in Node test runner
 
 `npm test` runs thirteen tests covering mock data, duration formatting, search/filter, playlist names, duplicates, removal, reordering, storage, queue navigation, playback timing and seeking.
 
-The unit tests passed in the preparation environment. The JSX and Tailwind CSS were also checked in an offline Chromium smoke test using locally available React, a mock Axios adapter and in-memory storage. The standard npm installation, actual Axios network request, real browser storage across page reloads and Vite production build still need to be checked on a machine with npm registry access.
+All 13 unit tests passed in the preparation environment. The updated JSX and Tailwind CSS were also checked in an offline Chromium smoke test using locally available React 18.2, a mock Axios adapter and the sample song data. Timer progression, pause, resume, seeking, automatic next track, previous track, and no horizontal overflow at 375, 768 and 1440 pixels were verified. The standard npm installation, actual React 19/Vite production build, Axios request, and real browser storage across page reloads still need to be checked on a machine with npm registry access. The actual Netlify deployment is not yet performed.
 
 Manual verification checklist after installing the project:
 
